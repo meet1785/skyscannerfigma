@@ -32,6 +32,13 @@ See [`JIRA_STORIES.md`](JIRA_STORIES.md) for three complete stories ready to ent
 
 Each story includes: description, acceptance criteria, design links, technical notes, and definition of done.
 
+### Bulk Import Option
+For faster setup, use [`jira_import.csv`](jira_import.csv) to bulk import all three stories into JIRA:
+1. Go to JIRA > Issues > Import Issues from CSV
+2. Upload the CSV file
+3. Map fields: Summary → Summary, Issue Type → Issue Type, etc.
+4. Import and assign to your project
+
 ## How to View the Designs
 
 ```bash
