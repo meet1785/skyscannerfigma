@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skyscanner Ad Platform — User Feedback</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f0f4f8;
+      color: #1a2b42;
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ===== TOP NAV ===== */
+    .topnav {
+      background: #0770e3;
+      color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 56px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(7,112,227,.25);
+    }
+    .topnav .logo {
+      font-size: 20px; font-weight: 700; letter-spacing: -.3px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .topnav .logo svg { width: 28px; height: 28px; }
+    .topnav .nav-links { display: flex; gap: 28px; font-size: 14px; font-weight: 500; }
+    .topnav .nav-links a { opacity: .85; transition: opacity .15s; }
+    .topnav .nav-links a:hover, .topnav .nav-links a.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+    .topnav .user-menu { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .topnav .avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: #fff3;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
+    }
+
+    /* ===== LAYOUT ===== */
+    .page-shell {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    /* ===== WELCOME BANNER ===== */
+    .welcome-banner {
+      background: linear-gradient(135deg, #0770e3 0%, #055cb5 100%);
+      border-radius: 16px;
+      padding: 36px 40px;
+      color: #fff;
+      margin-bottom: 28px;
+      animation: fadeIn .35s ease;
+    }
+    .welcome-banner h1 {
+      font-size: 26px; font-weight: 700; margin-bottom: 8px;
+    }
+    .welcome-banner p {
+      font-size: 15px; opacity: .9; line-height: 1.6; max-width: 540px;
+    }
+    .welcome-banner .time-estimate {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.18);
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 13px; font-weight: 600;
+      margin-top: 14px;
+    }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-wrap {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      margin-bottom: 24px;
+      animation: fadeIn .4s ease;
+    }
+    .progress-top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px;
+    }
+    .progress-top span { font-size: 13px; font-weight: 600; color: #68778d; }
+    .progress-top .progress-pct { color: #0770e3; font-weight: 700; }
+    .progress-bar-bg {
+      width: 100%; height: 8px; background: #e8ecf0; border-radius: 10px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 10px;
+      background: linear-gradient(90deg, #0770e3, #00a698);
+      transition: width .4s ease;
+    }
+
+    /* ===== QUESTION CARDS ===== */
+    .question-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 32px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      border-left: 4px solid #0770e3;
+      animation: fadeIn .45s ease;
+    }
+    .question-card.optional { border-left-color: #c1c9d6; }
+    .question-card .q-number {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .5px; color: #0770e3; margin-bottom: 6px;
+    }
+    .question-card.optional .q-number { color: #8e99a9; }
+    .question-card .q-text {
+      font-size: 16px; font-weight: 700; margin-bottom: 4px;
+    }
+    .question-card .q-desc {
+      font-size: 13px; color: #68778d; margin-bottom: 18px; line-height: 1.5;
+    }
+    .question-card .optional-tag {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      background: #f0f3f6; color: #8e99a9;
+      padding: 2px 8px; border-radius: 4px; margin-left: 8px;
+    }
+
+    /* Star Rating */
+    .star-rating { display: flex; gap: 6px; }
+    .star-rating .star {
+      width: 44px; height: 44px; border-radius: 10px;
+      border: 2px solid #d1d9e2; background: #fafbfc;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; cursor: pointer;
+      transition: all .15s;
+    }
+    .star-rating .star:hover,
+    .star-rating .star.selected {
+      border-color: #f5a623; background: #fff8eb;
+      transform: scale(1.08);
+    }
+    .star-rating .star.selected { background: #fff2d4; }
+    .star-labels {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: #8e99a9; margin-top: 6px;
+      padding: 0 4px;
+      max-width: 252px;
+    }
+
+    /* Radio Options */
+    .radio-options { display: flex; flex-direction: column; gap: 8px; }
+    .radio-opt {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 10px;
+      border: 1.5px solid #d1d9e2; background: #fafbfc;
+      cursor: pointer; transition: all .15s;
+    }
+    .radio-opt:hover { border-color: #0770e3; background: #f0f6ff; }
+    .radio-opt.selected { border-color: #0770e3; background: #f0f6ff; }
+    .radio-opt .radio-circle {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid #c1c9d6; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .radio-opt.selected .radio-circle {
+      border-color: #0770e3;
+    }
+    .radio-opt.selected .radio-circle::after {
+      content: ''; width: 10px; height: 10px;
+      border-radius: 50%; background: #0770e3;
+    }
+    .radio-opt .radio-label { font-size: 14px; font-weight: 500; }
+
+    /* Checkbox group */
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .check-chip {
+      padding: 8px 16px; border-radius: 20px;
+      border: 1.5px solid #d1d9e2; background: #fafbfc;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all .15s;
+    }
+    .check-chip:hover { border-color: #0770e3; }
+    .check-chip.selected { border-color: #0770e3; background: #f0f6ff; color: #0770e3; font-weight: 600; }
+
+    /* NPS Scale */
+    .nps-scale { display: flex; gap: 4px; }
+    .nps-btn {
+      flex: 1; height: 44px;
+      border-radius: 8px; border: 1.5px solid #d1d9e2;
+      background: #fafbfc; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all .15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nps-btn:hover { border-color: #0770e3; background: #f0f6ff; }
+    .nps-btn.selected { background: #0770e3; color: #fff; border-color: #0770e3; }
+    .nps-labels {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: #8e99a9; margin-top: 6px;
+    }
+
+    /* Textarea */
+    .feedback-textarea {
+      width: 100%; min-height: 100px;
+      padding: 12px 16px; border-radius: 10px;
+      border: 1.5px solid #d1d9e2; background: #fafbfc;
+      font-size: 14px; font-family: inherit; color: #1a2b42;
+      resize: vertical; transition: border-color .15s;
+    }
+    .feedback-textarea:focus {
+      outline: none; border-color: #0770e3; background: #fff;
+      box-shadow: 0 0 0 3px rgba(7,112,227,.1);
+    }
+    .char-count { font-size: 12px; color: #8e99a9; text-align: right; margin-top: 4px; }
+
+    /* ===== ANONYMOUS TOGGLE ===== */
+    .anon-toggle {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border-radius: 12px; padding: 16px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 20px;
+      animation: fadeIn .5s ease;
+    }
+    .toggle-switch {
+      width: 44px; height: 24px; border-radius: 12px;
+      background: #c1c9d6; position: relative;
+      cursor: pointer; transition: background .2s;
+      flex-shrink: 0;
+    }
+    .toggle-switch.on { background: #0770e3; }
+    .toggle-switch .toggle-knob {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #fff; position: absolute;
+      top: 2px; left: 2px; transition: left .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    }
+    .toggle-switch.on .toggle-knob { left: 22px; }
+    .anon-toggle-label { font-size: 14px; font-weight: 600; }
+    .anon-toggle-desc { font-size: 12px; color: #68778d; }
+
+    /* ===== SUBMIT ===== */
+    .submit-section {
+      text-align: center;
+      padding-top: 8px;
+      animation: fadeIn .55s ease;
+    }
+    .btn-submit {
+      background: #0770e3; color: #fff;
+      padding: 14px 48px; border: none; border-radius: 10px;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: background .15s;
+      box-shadow: 0 4px 12px rgba(7,112,227,.25);
+    }
+    .btn-submit:hover { background: #055cb5; }
+    .submit-note {
+      font-size: 12px; color: #8e99a9; margin-top: 10px;
+    }
+
+    /* ===== THANK YOU (hidden by default) ===== */
+    .thank-you {
+      display: none;
+      text-align: center;
+      background: #fff;
+      border-radius: 16px;
+      padding: 48px 40px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      animation: fadeIn .4s ease;
+    }
+    .thank-you.visible { display: block; }
+    .thank-you .ty-icon { font-size: 56px; margin-bottom: 16px; }
+    .thank-you h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .thank-you p { font-size: 15px; color: #68778d; line-height: 1.6; max-width: 420px; margin: 0 auto; }
+    .thank-you .btn-return {
+      display: inline-block; margin-top: 24px;
+      background: #0770e3; color: #fff;
+      padding: 12px 32px; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      border: none; transition: background .15s;
+    }
+    .thank-you .btn-return:hover { background: #055cb5; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    @media (max-width: 600px) {
+      .page-shell { padding: 16px; }
+      .welcome-banner { padding: 24px; }
+      .nps-scale { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      Skyscanner Ads
+    </div>
+    <div class="nav-links">
+      <a href="1-ad-creation.html">Create Ad</a>
+      <a href="2-ad-performance.html">Performance</a>
+      <a href="3-user-feedback.html" class="active">Feedback</a>
+    </div>
+    <div class="user-menu">
+      <span>Partner Co.</span>
+      <div class="avatar">PC</div>
+    </div>
+  </nav>
+
+  <div class="page-shell" id="feedbackForm">
+    <!-- WELCOME BANNER -->
+    <div class="welcome-banner">
+      <h1>💬 We'd Love Your Feedback</h1>
+      <p>Help us improve the Skyscanner Ad Platform by sharing your experience. Your input directly shapes what we build next.</p>
+      <div class="time-estimate">⏱ Takes about 2 minutes</div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <span>Your Progress</span>
+        <span class="progress-pct" id="progressPct">0 of 6 answered</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Q1: Overall Satisfaction -->
+    <div class="question-card">
+      <div class="q-number">Question 1 of 6</div>
+      <div class="q-text">How satisfied are you with the Skyscanner Ad Platform?</div>
+      <div class="q-desc">Rate your overall experience so far.</div>
+      <div class="star-rating" id="q1Stars">
+        <div class="star" onclick="selectStar(1)">⭐</div>
+        <div class="star" onclick="selectStar(2)">⭐</div>
+        <div class="star" onclick="selectStar(3)">⭐</div>
+        <div class="star" onclick="selectStar(4)">⭐</div>
+        <div class="star" onclick="selectStar(5)">⭐</div>
+      </div>
+      <div class="star-labels">
+        <span>Very Unsatisfied</span>
+        <span>Very Satisfied</span>
+      </div>
+    </div>
+
+    <!-- Q2: Ease of Use -->
+    <div class="question-card">
+      <div class="q-number">Question 2 of 6</div>
+      <div class="q-text">How easy was it to create your first advertisement?</div>
+      <div class="q-desc">Think about the ad creation wizard you just used.</div>
+      <div class="radio-options" id="q2Options">
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Very easy — I completed it without help</span>
+        </div>
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Somewhat easy — only a few confusing parts</span>
+        </div>
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Neutral — it was okay</span>
+        </div>
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Somewhat difficult — I needed help at times</span>
+        </div>
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Very difficult — I could not complete it alone</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3: Most Useful Feature -->
+    <div class="question-card">
+      <div class="q-number">Question 3 of 6</div>
+      <div class="q-text">Which features do you find most useful?</div>
+      <div class="q-desc">Select all that apply.</div>
+      <div class="checkbox-group" id="q3Checks">
+        <div class="check-chip" onclick="toggleChip(this)">📝 Ad Creation Wizard</div>
+        <div class="check-chip" onclick="toggleChip(this)">📊 Performance Dashboard</div>
+        <div class="check-chip" onclick="toggleChip(this)">🔍 Campaign Search</div>
+        <div class="check-chip" onclick="toggleChip(this)">📥 Report Export</div>
+        <div class="check-chip" onclick="toggleChip(this)">🎯 Audience Targeting</div>
+        <div class="check-chip" onclick="toggleChip(this)">👁 Live Preview</div>
+        <div class="check-chip" onclick="toggleChip(this)">💾 Draft Saving</div>
+      </div>
+    </div>
+
+    <!-- Q4: NPS -->
+    <div class="question-card">
+      <div class="q-number">Question 4 of 6</div>
+      <div class="q-text">How likely are you to recommend this platform to a colleague?</div>
+      <div class="q-desc">0 = Not at all likely · 10 = Extremely likely</div>
+      <div class="nps-scale" id="q4NPS">
+        <div class="nps-btn" onclick="selectNPS(this)">0</div>
+        <div class="nps-btn" onclick="selectNPS(this)">1</div>
+        <div class="nps-btn" onclick="selectNPS(this)">2</div>
+        <div class="nps-btn" onclick="selectNPS(this)">3</div>
+        <div class="nps-btn" onclick="selectNPS(this)">4</div>
+        <div class="nps-btn" onclick="selectNPS(this)">5</div>
+        <div class="nps-btn" onclick="selectNPS(this)">6</div>
+        <div class="nps-btn" onclick="selectNPS(this)">7</div>
+        <div class="nps-btn" onclick="selectNPS(this)">8</div>
+        <div class="nps-btn" onclick="selectNPS(this)">9</div>
+        <div class="nps-btn" onclick="selectNPS(this)">10</div>
+      </div>
+      <div class="nps-labels">
+        <span>Not likely</span>
+        <span>Extremely likely</span>
+      </div>
+    </div>
+
+    <!-- Q5: Improvement Areas -->
+    <div class="question-card">
+      <div class="q-number">Question 5 of 6</div>
+      <div class="q-text">What area needs the most improvement?</div>
+      <div class="q-desc">Choose the single biggest opportunity.</div>
+      <div class="radio-options" id="q5Options">
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Navigation & layout</span>
+        </div>
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Ad creation flow</span>
+        </div>
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Performance reporting</span>
+        </div>
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Account & billing management</span>
+        </div>
+        <div class="radio-opt" onclick="selectRadio(this)">
+          <div class="radio-circle"></div>
+          <span class="radio-label">Documentation & help resources</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q6: Open Feedback (optional) -->
+    <div class="question-card optional">
+      <div class="q-number">Question 6 of 6 <span class="optional-tag">Optional</span></div>
+      <div class="q-text">Anything else you'd like to share?</div>
+      <div class="q-desc">Tell us what's working, what's not, or what you'd like to see next.</div>
+      <textarea class="feedback-textarea" id="q6Text" placeholder="Type your thoughts here..."
+                oninput="document.getElementById('charCount').textContent = this.value.length + ' / 500'"></textarea>
+      <div class="char-count" id="charCount">0 / 500</div>
+    </div>
+
+    <!-- ANONYMOUS TOGGLE -->
+    <div class="anon-toggle">
+      <div class="toggle-switch" id="anonToggle" onclick="toggleAnon()">
+        <div class="toggle-knob"></div>
+      </div>
+      <div>
+        <div class="anon-toggle-label">Submit anonymously</div>
+        <div class="anon-toggle-desc">Your name won't be attached to this feedback.</div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-section">
+      <button class="btn-submit" onclick="submitFeedback()">Submit Feedback</button>
+      <div class="submit-note">You can update your feedback at any time from Account Settings.</div>
+    </div>
+  </div>
+
+  <!-- THANK YOU STATE -->
+  <div class="page-shell">
+    <div class="thank-you" id="thankYou">
+      <div class="ty-icon">🎉</div>
+      <h2>Thank You for Your Feedback!</h2>
+      <p>Your response has been recorded. We review every piece of feedback and use it to improve the platform for you and all our partners.</p>
+      <button class="btn-return" onclick="location.href='2-ad-performance.html'">← Back to Dashboard</button>
+    </div>
+  </div>
+
+  <script>
+    let answered = new Set();
+
+    function updateProgress() {
+      const total = 6;
+      const count = answered.size;
+      document.getElementById('progressPct').textContent = count + ' of ' + total + ' answered';
+      document.getElementById('progressBar').style.width = ((count / total) * 100) + '%';
+    }
+
+    function selectStar(n) {
+      const stars = document.querySelectorAll('#q1Stars .star');
+      stars.forEach((s, i) => {
+        s.classList.toggle('selected', i < n);
+      });
+      answered.add('q1');
+      updateProgress();
+    }
+
+    function selectRadio(el) {
+      const parent = el.parentElement;
+      parent.querySelectorAll('.radio-opt').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      answered.add(parent.id);
+      updateProgress();
+    }
+
+    function toggleChip(el) {
+      el.classList.toggle('selected');
+      if (document.querySelectorAll('#q3Checks .check-chip.selected').length > 0) {
+        answered.add('q3');
+      } else {
+        answered.delete('q3');
+      }
+      updateProgress();
+    }
+
+    function selectNPS(el) {
+      el.parentElement.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      answered.add('q4');
+      updateProgress();
+    }
+
+    function toggleAnon() {
+      document.getElementById('anonToggle').classList.toggle('on');
+    }
+
+    function submitFeedback() {
+      document.getElementById('feedbackForm').style.display = 'none';
+      document.getElementById('thankYou').classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

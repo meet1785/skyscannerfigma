@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skyscanner Ad Platform — Create Advertisement</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f0f4f8;
+      color: #1a2b42;
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ===== TOP NAV ===== */
+    .topnav {
+      background: #0770e3;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(7,112,227,.25);
+    }
+    .topnav .logo {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -.3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topnav .logo svg { width: 28px; height: 28px; }
+    .topnav .nav-links { display: flex; gap: 28px; font-size: 14px; font-weight: 500; }
+    .topnav .nav-links a { opacity: .85; transition: opacity .15s; }
+    .topnav .nav-links a:hover, .topnav .nav-links a.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+    .topnav .user-menu { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .topnav .avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: #fff3;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
+    }
+
+    /* ===== BREADCRUMB ===== */
+    .breadcrumb {
+      padding: 16px 32px 0;
+      font-size: 13px;
+      color: #68778d;
+    }
+    .breadcrumb span { margin: 0 6px; }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      padding: 12px 32px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-header h1 { font-size: 26px; font-weight: 700; }
+    .btn-save-draft {
+      background: #fff;
+      border: 1.5px solid #c1c9d6;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #1a2b42;
+      transition: all .15s;
+    }
+    .btn-save-draft:hover { border-color: #0770e3; color: #0770e3; }
+
+    /* ===== PROGRESS STEPPER ===== */
+    .stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 32px 8px;
+      gap: 0;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #8e99a9;
+      position: relative;
+    }
+    .step.active { color: #0770e3; }
+    .step.completed { color: #00a698; }
+    .step-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 2.5px solid #c1c9d6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      background: #fff;
+      transition: all .2s;
+    }
+    .step.active .step-circle { border-color: #0770e3; background: #0770e3; color: #fff; }
+    .step.completed .step-circle { border-color: #00a698; background: #00a698; color: #fff; }
+    .step-line {
+      width: 60px; height: 2.5px; background: #c1c9d6; margin: 0 8px; border-radius: 2px;
+    }
+    .step.completed + .step-line,
+    .step-line.done { background: #00a698; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      padding: 20px 32px 40px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* ===== FORM CARD ===== */
+    .form-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 32px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .form-card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .form-card .subtitle {
+      font-size: 14px;
+      color: #68778d;
+      margin-bottom: 28px;
+    }
+
+    .form-group { margin-bottom: 22px; }
+    .form-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .form-group .help-icon {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #e8ecf0; color: #68778d;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; cursor: help;
+      position: relative;
+    }
+    .form-group .help-icon:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 120%;
+      left: 50%; transform: translateX(-50%);
+      background: #1a2b42; color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 400;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #d1d9e2;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1a2b42;
+      background: #fafbfc;
+      transition: border-color .15s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #0770e3;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(7,112,227,.1);
+    }
+    .form-group textarea { min-height: 90px; resize: vertical; }
+    .form-group .hint {
+      font-size: 12px; color: #8e99a9; margin-top: 4px;
+    }
+
+    /* upload area */
+    .upload-area {
+      border: 2px dashed #c1c9d6;
+      border-radius: 10px;
+      padding: 32px;
+      text-align: center;
+      background: #fafbfc;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .upload-area:hover { border-color: #0770e3; background: #f0f6ff; }
+    .upload-area svg { width: 40px; height: 40px; color: #0770e3; margin-bottom: 8px; }
+    .upload-area p { font-size: 14px; color: #68778d; }
+    .upload-area .browse { color: #0770e3; font-weight: 600; cursor: pointer; }
+
+    /* radio group */
+    .radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .radio-card {
+      flex: 1; min-width: 120px;
+      border: 1.5px solid #d1d9e2;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      background: #fafbfc;
+      transition: all .15s;
+    }
+    .radio-card:hover { border-color: #0770e3; }
+    .radio-card.selected { border-color: #0770e3; background: #f0f6ff; box-shadow: 0 0 0 3px rgba(7,112,227,.1); }
+    .radio-card .icon { font-size: 24px; margin-bottom: 4px; }
+    .radio-card .label { font-size: 13px; font-weight: 600; }
+    .radio-card .desc { font-size: 11px; color: #68778d; margin-top: 2px; }
+
+    /* ===== PREVIEW CARD ===== */
+    .preview-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      position: sticky;
+      top: 80px;
+      align-self: start;
+    }
+    .preview-card h3 {
+      font-size: 16px; font-weight: 700; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .preview-card h3 .badge {
+      font-size: 11px; background: #e6f7f5; color: #00a698;
+      padding: 2px 8px; border-radius: 20px; font-weight: 600;
+    }
+    .preview-mock {
+      background: linear-gradient(135deg, #e6f0fa 0%, #f0f4f8 100%);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #e0e6ed;
+    }
+    .preview-mock .mock-header {
+      background: #0770e3;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: #fff;
+      font-weight: 600;
+    }
+    .preview-mock .mock-body { padding: 16px; }
+    .preview-mock .mock-img {
+      width: 100%; height: 140px;
+      background: linear-gradient(135deg, #b0d4f1 0%, #80b9e8 100%);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .preview-mock .mock-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .preview-mock .mock-desc { font-size: 12px; color: #68778d; margin-bottom: 10px; line-height: 1.5; }
+    .preview-mock .mock-cta {
+      display: inline-block;
+      background: #0770e3;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .preview-specs {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #e8ecf0;
+    }
+    .preview-specs h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #68778d; text-transform: uppercase; letter-spacing: .5px; }
+    .spec-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; }
+    .spec-row .spec-label { color: #8e99a9; }
+    .spec-row .spec-value { font-weight: 600; }
+
+    /* ===== FOOTER ACTIONS ===== */
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #e8ecf0;
+    }
+    .btn {
+      padding: 10px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+    }
+    .btn-secondary {
+      background: #fff;
+      border: 1.5px solid #c1c9d6;
+      color: #1a2b42;
+    }
+    .btn-secondary:hover { border-color: #0770e3; color: #0770e3; }
+    .btn-primary {
+      background: #0770e3;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #055cb5; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .preview-card { position: static; }
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .form-card, .preview-card { animation: fadeIn .35s ease; }
+  </style>
+</head>
+<body>
+  <!-- TOP NAVIGATION -->
+  <nav class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      Skyscanner Ads
+    </div>
+    <div class="nav-links">
+      <a href="1-ad-creation.html" class="active">Create Ad</a>
+      <a href="2-ad-performance.html">Performance</a>
+      <a href="3-user-feedback.html">Feedback</a>
+    </div>
+    <div class="user-menu">
+      <span>Partner Co.</span>
+      <div class="avatar">PC</div>
+    </div>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    Dashboard <span>›</span> Campaigns <span>›</span> <strong>Create New Ad</strong>
+  </div>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>Create New Advertisement</h1>
+    <button class="btn-save-draft">💾 Save Draft</button>
+  </div>
+
+  <!-- PROGRESS STEPPER -->
+  <div class="stepper">
+    <div class="step completed">
+      <div class="step-circle">✓</div>
+      <span>Campaign</span>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step active">
+      <div class="step-circle">2</div>
+      <span>Ad Content</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">3</div>
+      <span>Targeting</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">4</div>
+      <span>Review</span>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-layout">
+    <!-- FORM -->
+    <div class="form-card">
+      <h2>Ad Content</h2>
+      <p class="subtitle">Design how your ad looks to Skyscanner travelers. Fill out the fields below and see a live preview on the right.</p>
+
+      <!-- Ad Format -->
+      <div class="form-group">
+        <label>Ad Format <span class="help-icon" data-tip="Choose how your ad is displayed to users">?</span></label>
+        <div class="radio-group">
+          <div class="radio-card selected" onclick="selectFormat(this)">
+            <div class="icon">🖼️</div>
+            <div class="label">Banner</div>
+            <div class="desc">Image-based display</div>
+          </div>
+          <div class="radio-card" onclick="selectFormat(this)">
+            <div class="icon">📐</div>
+            <div class="label">Native</div>
+            <div class="desc">Blends with content</div>
+          </div>
+          <div class="radio-card" onclick="selectFormat(this)">
+            <div class="icon">🎬</div>
+            <div class="label">Video</div>
+            <div class="desc">Motion & sound</div>
+          </div>
+          <div class="radio-card" onclick="selectFormat(this)">
+            <div class="icon">🔍</div>
+            <div class="label">Sponsored</div>
+            <div class="desc">Search results</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Headline -->
+      <div class="form-group">
+        <label>Headline <span class="help-icon" data-tip="Keep it short — 6 words or fewer works best">?</span></label>
+        <input type="text" id="headline" placeholder="e.g. Fly Direct to Barcelona" maxlength="60"
+               oninput="document.getElementById('previewTitle').textContent = this.value || 'Your Ad Headline'" />
+        <div class="hint">Max 60 characters. Short, compelling headlines get 2× more clicks.</div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description <span class="help-icon" data-tip="Describe the offer — what makes it special?">?</span></label>
+        <textarea id="description" placeholder="e.g. Book now and save up to 30% on flights from London to Barcelona. Limited seats available!"
+                  oninput="document.getElementById('previewDesc').textContent = this.value || 'Your ad description will appear here. Make it compelling!'"></textarea>
+        <div class="hint">Max 150 characters recommended for best display.</div>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="form-group">
+        <label>Creative Asset <span class="help-icon" data-tip="Upload a 1200×628px image for best results">?</span></label>
+        <div class="upload-area">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <p>Drag & drop your image here, or <span class="browse">browse files</span></p>
+          <p style="font-size:12px;color:#8e99a9;margin-top:4px">PNG, JPG up to 5 MB · Recommended 1200 × 628 px</p>
+        </div>
+      </div>
+
+      <!-- Destination URL -->
+      <div class="form-group">
+        <label>Destination URL <span class="help-icon" data-tip="Where should users go when they click?">?</span></label>
+        <input type="url" placeholder="https://www.yoursite.com/offer" />
+      </div>
+
+      <!-- Call to Action -->
+      <div class="form-group">
+        <label>Call to Action <span class="help-icon" data-tip="Button text shown on the ad">?</span></label>
+        <select id="cta" onchange="document.getElementById('previewCta').textContent = this.value">
+          <option>Book Now</option>
+          <option>Learn More</option>
+          <option>Get Offer</option>
+          <option>Shop Now</option>
+          <option>Sign Up</option>
+        </select>
+      </div>
+
+      <!-- FOOTER ACTIONS -->
+      <div class="footer-actions">
+        <button class="btn btn-secondary">← Back to Campaign</button>
+        <button class="btn btn-primary">Continue to Targeting →</button>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-card">
+      <h3>
+        Live Preview
+        <span class="badge">Desktop</span>
+      </h3>
+      <div class="preview-mock">
+        <div class="mock-header">skyscanner.net — Sponsored</div>
+        <div class="mock-body">
+          <div class="mock-img">1200 × 628</div>
+          <div class="mock-title" id="previewTitle">Your Ad Headline</div>
+          <div class="mock-desc" id="previewDesc">Your ad description will appear here. Make it compelling!</div>
+          <div class="mock-cta" id="previewCta">Book Now</div>
+        </div>
+      </div>
+
+      <div class="preview-specs">
+        <h4>Ad Specifications</h4>
+        <div class="spec-row"><span class="spec-label">Format</span><span class="spec-value">Banner</span></div>
+        <div class="spec-row"><span class="spec-label">Placement</span><span class="spec-value">Search Results</span></div>
+        <div class="spec-row"><span class="spec-label">Image</span><span class="spec-value">Not uploaded</span></div>
+        <div class="spec-row"><span class="spec-label">Headline</span><span class="spec-value">0 / 60 chars</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectFormat(el) {
+      document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+  </script>
+</body>
+</html>
